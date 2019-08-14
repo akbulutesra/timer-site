@@ -1,81 +1,151 @@
-import React from 'react';
+import React, { Component } from 'react';
 import './App.css';
 import { Container, Row, Col } from 'react-bootstrap';
 import { FaPlus, FaMinus } from "react-icons/fa";
+import Countdown from 'react-countdown-now';
+import UIfx from 'uifx';
+import tickAudio from './assets/alarm.mp3';
 
+const tick = new UIfx({asset: tickAudio});
 
-function App() {
-  return (
-    <Container>
-      <Row>
-        <Col></Col>
-      </Row>
-      <Row className="text-center mt-5">
-        <Col>
-          <Container>
-            <Row>
-              <Col className="titleText">
-                Break
-              </Col>
-            </Row>
+class App extends Component {
 
-            <Row>
-              <Col className="numberText">
-                5
-              </Col>
-            </Row>
+  constructor(props) {
+    super(props);
 
-            <Row>
-              <Col className="text-right">
-                <FaPlus />
-              </Col>
-              <Col className="text-left">
-                <FaMinus />
-              </Col>
-            </Row>
-          </Container>
-        </Col>
+    this.handleClickBreakPlus = this.handleClickBreakPlus.bind(this);
+    this.handleClickBreakMinus = this.handleClickBreakMinus.bind(this);
+    this.handleClickTimePlus = this.handleClickTimePlus.bind(this);
+    this.handleClickTimeMinus = this.handleClickTimeMinus.bind(this);
+    this.timeCompleted = this.timeCompleted.bind(this);
 
-        <Col>
-          <Container>
-            <Row>
-              <Col className="titleText">
-                Time
-              </Col>
-            </Row>
+    this.state = {
+      breakValue: 5,
+      timeValue: 1,
+    }
 
-            <Row>
-              <Col className="numberText">
-                5
-              </Col>
-            </Row>
+  }
+  handleClickBreakPlus() {
+    console.log('break + clicked');
 
-            <Row>
-              <Col className="text-right">
-                <FaPlus />
+    const newBreak = this.state.breakValue + 1;
+
+    this.setState({
+      breakValue: newBreak,
+    })
+  }
+
+  handleClickBreakMinus() {
+    console.log('break - clicked');
+
+    const newBreak = this.state.breakValue - 1;
+
+    this.setState({
+      breakValue: newBreak,
+    })
+  }
+
+  handleClickTimePlus() {
+    console.log('time + clicked');
+
+    const newTime = this.state.timeValue + 1;
+
+    this.setState({
+      timeValue: newTime,
+    })
+  }
+
+  handleClickTimeMinus() {
+    console.log('time - clicked');
+
+    const newTime = this.state.timeValue - 1;
+
+    this.setState({
+      timeValue: newTime,
+    })
+  }
+
+  timeCompleted() {
+    console.log('time completed');
+    tick.play();
+  }
+
+  render() {
+    return (
+      <Container>
+        <Row>
+          <Col></Col>
+        </Row>
+        <Row className="text-center mt-5">
+          <Col>
+            <Container>
+              <Row>
+                <Col className="titleText">
+                  Break
               </Col>
-              <Col className="text-left">
-                <FaMinus />
+              </Row>
+
+              <Row>
+                <Col className="numberText">
+                  {this.state.breakValue}
+                </Col>
+              </Row>
+
+              <Row>
+                <Col className="text-right" onClick={this.handleClickBreakPlus}>
+                  <FaPlus />
+                </Col>
+                <Col className="text-left" onClick={this.handleClickBreakMinus}>
+                  <FaMinus />
+                </Col>
+              </Row>
+            </Container>
+          </Col>
+
+          <Col>
+            <Container>
+              <Row>
+                <Col className="titleText">
+                  Time
               </Col>
-            </Row>
-          </Container>
-        </Col>
-      </Row>
-      <Row className="text-center mt-5">
-        <Col>
-          <div className="circle_container">
-            <div className="circle_main">
-              <div className="circle_text_container">
-                <div className="circle_text">
-                  25:00
-			          </div>
+              </Row>
+
+              <Row>
+                <Col className="numberText">
+                  {this.state.timeValue}
+                </Col>
+              </Row>
+
+              <Row>
+                <Col className="text-right" onClick={this.handleClickTimePlus}>
+                  <FaPlus />
+                </Col>
+                <Col className="text-left" onClick={this.handleClickTimeMinus}>
+                  <FaMinus />
+                </Col>
+              </Row>
+            </Container>
+          </Col>
+        </Row>
+        <Row className="text-center mt-5">
+          <Col>
+            <div className="circle_container">
+              <div className="circle_main">
+                <div className="circle_text_container">
+                  <div className="circle_text">
+                    <Countdown date={Date.now() + this.state.timeValue * 60 * 1000}
+                      renderer={props => <div>{props.minutes}:{props.seconds}</div>}
+                      onComplete={this.timeCompleted}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </Col>
-      </Row>
-    </Container>
-  );
+          </Col>
+        </Row>
+      </Container>
+    );
+  }
 }
 
 export default App;
