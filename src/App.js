@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import './App.css';
 import { Container, Row, Col } from 'react-bootstrap';
 import { FaPlus, FaMinus } from "react-icons/fa";
-import Countdown from 'react-countdown-now';
+import Countdown, { CountdownApi } from 'react-countdown-now';
 import UIfx from 'uifx';
 import tickAudio from './assets/alarm.mp3';
 
-const tick = new UIfx({asset: tickAudio});
+const tick = new UIfx({ asset: tickAudio });
 
 class App extends Component {
 
@@ -18,13 +18,34 @@ class App extends Component {
     this.handleClickTimePlus = this.handleClickTimePlus.bind(this);
     this.handleClickTimeMinus = this.handleClickTimeMinus.bind(this);
     this.timeCompleted = this.timeCompleted.bind(this);
+    this.startTimer = this.startTimer.bind(this);
 
     this.state = {
       breakValue: 5,
       timeValue: 1,
     }
-
   }
+
+  startTimer() {
+    console.log('start timer')
+    this.countdownApi && this.countdownApi.start();
+    console.log(this)
+    this.child.start();
+  }
+
+  setRef(countdown) {
+    if (countdown) {
+      this.countdownApi = countdown.getApi();
+    }
+    console.log('set ref')
+    console.log(this)
+    console.log(countdown)
+  }
+
+  handleUpdate = () => {
+    this.forceUpdate();
+  }
+
   handleClickBreakPlus() {
     console.log('break + clicked');
 
@@ -128,7 +149,7 @@ class App extends Component {
           </Col>
         </Row>
         <Row className="text-center mt-5">
-          <Col>
+          <Col onClick={this.startTimer}>
             <div className="circle_container">
               <div className="circle_main">
                 <div className="circle_text_container">
@@ -136,6 +157,8 @@ class App extends Component {
                     <Countdown date={Date.now() + this.state.timeValue * 60 * 1000}
                       renderer={props => <div>{props.minutes}:{props.seconds}</div>}
                       onComplete={this.timeCompleted}
+                      autoStart={false}
+                      ref={ref => ( this.child = ref)}
                     />
                   </div>
                 </div>
