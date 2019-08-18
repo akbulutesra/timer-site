@@ -18,28 +18,30 @@ class App extends Component {
     this.handleClickTimePlus = this.handleClickTimePlus.bind(this);
     this.handleClickTimeMinus = this.handleClickTimeMinus.bind(this);
     this.timeCompleted = this.timeCompleted.bind(this);
-    this.startTimer = this.startTimer.bind(this);
+    this.startPauseTimerHandler = this.startPauseTimerHandler.bind(this);
 
     this.state = {
       breakValue: 5,
-      timeValue: 1,
+      sessionValue: 1,
+      isRunning: false,
+      // false break, true session
+      whichOneRunning: 1,
+      time: 0,
     }
   }
 
-  startTimer() {
-    console.log('start timer')
-    this.countdownApi && this.countdownApi.start();
-    console.log(this)
-    this.child.start();
-  }
+  startPauseTimerHandler() {
+    console.log(this.state);
 
-  setRef(countdown) {
-    if (countdown) {
-      this.countdownApi = countdown.getApi();
+    if (this.state.isRunning) {
+      this.child.pause();
+    } else {
+      this.child.start();
     }
-    console.log('set ref')
-    console.log(this)
-    console.log(countdown)
+
+    this.setState({
+      isRunning: !this.state.isRunning,
+    })
   }
 
   handleUpdate = () => {
@@ -48,47 +50,58 @@ class App extends Component {
 
   handleClickBreakPlus() {
     console.log('break + clicked');
+    if (!this.state.isRunning) {
+      const newBreak = this.state.breakValue + 1;
 
-    const newBreak = this.state.breakValue + 1;
-
-    this.setState({
-      breakValue: newBreak,
-    })
+      this.setState({
+        breakValue: newBreak,
+      })
+    }
   }
 
   handleClickBreakMinus() {
     console.log('break - clicked');
 
-    const newBreak = this.state.breakValue - 1;
+    if (!this.state.isRunning) {
+      const newBreak = this.state.breakValue - 1;
 
-    this.setState({
-      breakValue: newBreak,
-    })
+      this.setState({
+        breakValue: newBreak,
+      })
+    }
   }
 
   handleClickTimePlus() {
     console.log('time + clicked');
+    if (!this.state.isRunning) {
+      const newTime = this.state.sessionValue + 1;
 
-    const newTime = this.state.timeValue + 1;
-
-    this.setState({
-      timeValue: newTime,
-    })
+      this.setState({
+        sessionValue: newTime,
+      })
+    }
   }
 
   handleClickTimeMinus() {
     console.log('time - clicked');
+    if (!this.state.isRunning) {
+      const newTime = this.state.sessionValue - 1;
 
-    const newTime = this.state.timeValue - 1;
-
-    this.setState({
-      timeValue: newTime,
-    })
+      this.setState({
+        sessionValue: newTime,
+      })
+    }
   }
 
   timeCompleted() {
     console.log('time completed');
+    
+    this.setState({
+      whichOneRunning: !this.state.whichOneRunning,
+    })
+
     tick.play();
+    this.child.start();
   }
 
   render() {
@@ -102,7 +115,7 @@ class App extends Component {
             <Container>
               <Row>
                 <Col className="titleText">
-                  Break
+                  Break Length
               </Col>
               </Row>
 
@@ -112,7 +125,7 @@ class App extends Component {
                 </Col>
               </Row>
 
-              <Row>
+              <Row className="cursorPoint">
                 <Col className="text-right" onClick={this.handleClickBreakPlus}>
                   <FaPlus />
                 </Col>
@@ -127,17 +140,17 @@ class App extends Component {
             <Container>
               <Row>
                 <Col className="titleText">
-                  Time
+                  Session Length
               </Col>
               </Row>
 
               <Row>
                 <Col className="numberText">
-                  {this.state.timeValue}
+                  {this.state.sessionValue}
                 </Col>
               </Row>
 
-              <Row>
+              <Row className="cursorPoint">
                 <Col className="text-right" onClick={this.handleClickTimePlus}>
                   <FaPlus />
                 </Col>
@@ -149,16 +162,23 @@ class App extends Component {
           </Col>
         </Row>
         <Row className="text-center mt-5">
-          <Col onClick={this.startTimer}>
+          <Col className="cursorPoint" onClick={this.startPauseTimerHandler}>
             <div className="circle_container">
               <div className="circle_main">
                 <div className="circle_text_container">
                   <div className="circle_text">
-                    <Countdown date={Date.now() + this.state.timeValue * 60 * 1000}
+                    <div>
+                      {this.state.whichOneRunning == 0 ? (
+                        'Break'
+                      ) : (
+                          'Session'
+                        )}
+                    </div>
+                    <Countdown date={Date.now() + this.state.time}
                       renderer={props => <div>{props.minutes}:{props.seconds}</div>}
                       onComplete={this.timeCompleted}
                       autoStart={false}
-                      ref={ref => ( this.child = ref)}
+                      ref={ref => (this.child = ref)}
                     />
                   </div>
                 </div>

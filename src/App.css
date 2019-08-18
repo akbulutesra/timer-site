@@ -5,8 +5,8 @@
 /* Main Container -  this controls the size of the circle */
 .circle_container
 {
-	width : 128px;
-  height : 128px;
+	width : 150px;
+  height : 150px;
   margin: auto;
 	/* margin : 0; */
 	/* padding : 0; */
@@ -66,4 +66,8 @@
 
 .numberText {
   font-weight: bold;
+}
+
+.cursorPoint:hover {
+	cursor: pointer;
 }
